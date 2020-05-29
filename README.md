@@ -24,7 +24,6 @@ This repository contains the code and language model necessary to replicate the 
 
 * Bidirectional LSTM language model used in the experiments reported in the paper (`LSTM/model.pt`)
 
-* Jupyter Notebook showing how to extract representations and basic functions to evaluate them (e.g,, cosine similarity, nearest neighbors)
+*  `src/demo.ipynb` : Jupyter Notebook showing how to extract representations and basic functions to evaluate them (e.g,, cosine similarity, nearest neighbors)
 
-        `src/demo.ipynb`
-        
+      
