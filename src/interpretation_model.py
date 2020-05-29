@@ -32,8 +32,7 @@ def get_expected_and_lexical_vectors(language_model, vocab, context, index_targe
         #Get predictive hidden states (with target masked)
         _, all_hidden_states = language_model(data_context)
         # Get last hidden state
-        last_state = torch.Tensor(all_hidden_states[-1].squeeze(0)[index_target].cpu().detach().numpy()[0])
-        if cuda: last_state.cuda()
+        last_state = all_hidden_states[-1].squeeze(0)[index_target]
         T = language_model.cls.predictions.transform
     # apply transformation to last state
     expected_vector = T(last_state)
@@ -64,7 +63,7 @@ def combine_expected_and_lexical(expected, lexical, combination_type ='avg', nor
         word_tmp = Variable(word_tmp.unsqueeze(0), requires_grad=False)
         distance_function = torch.nn.CosineEmbeddingLoss()
         target = torch.ones(1)
-        if cuda: target.cuda()
+        if cuda: target = target.cuda()
         # Calculate distance and its gradients
         distance = distance_function(expectation_tmp, word_tmp, target)
         distance.backward()

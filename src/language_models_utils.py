@@ -135,7 +135,7 @@ def encode_context(context, index_target, vocab, cuda=False, model_type = 'LSTM'
         index_target = get_indices_word_after_encoding_BERT(context, index_target, vocab)[0]
         data_context = vocab.encode(context)
         if masked:
-            data_context[index_target_word] = vocab.piece2idx['[MASK]'][0]
+            data_context[index_target] = vocab.piece2idx['[MASK]'][0]
         data_context = torch.tensor([data_context]).cuda() if cuda else torch.tensor([data_context])
     return data_context, index_target, target
 
@@ -152,15 +152,18 @@ def get_word_embedding(word, vocab, language_model, model_type = 'LSTM'):
     :return: word vector, or None
     '''
     if model_type == 'LSTM':
-        return language_model.encoder.embedding.weight.data[vocab.word2idx[word]]
-    elif model_type == 'BERT':
+        if in_vocab(word, vocab,model_type):
+            return language_model.encoder.embedding.weight.data[vocab.word2idx[word]]
+        else:
+            print('Impossible to return a representation: word not covered in the vocabulary. ')
+    elif model_type.startswith('BERT'):
         encoded = vocab.word2idx(word)
         if len(encoded) == 1:
-            word_vector = language_model.bert.embeddings.word_embeddings.weight.data[encoded[0]].cpu().numpy()
+            word_vector = language_model.bert.embeddings.word_embeddings.weight.data[encoded[0]]
             return word_vector
         else:
-            print(word, 'is split into ', len(encoded), 'subword units.')
-            return None
+            print('Impossible to return a lexical representation: word not covered in the vocabulary. ')
+
 
 def get_logprobability_word(language_model, context, index_target_word, vocab, cuda = False, masked = True, model_type ='LSTM'):
     '''
@@ -183,9 +186,9 @@ def get_logprobability_word(language_model, context, index_target_word, vocab, c
         logprob_distr = torch.nn.functional.log_softmax(output_scores, dim=1).squeeze()
 
     if model_type.startswith('BERT'):
-        output_scores, _ = model(data_context)
-        output_scores = prediction_scores.squeeze(0)[index_target]
-        logprob_distr = torch.nn.functional.log_softmax(output_scores, dim=0).cpu().detach().numpy()
+        output_scores, _ = language_model(data_context)
+        output_scores = output_scores.squeeze(0)[index_target]
+        logprob_distr = torch.nn.functional.log_softmax(output_scores, dim=0)
     logprob_distr = logprob_distr.data.cpu().numpy()
     logprob_word = logprob_distr[word2idx(word, vocab, model_type)]
     return logprob_word
