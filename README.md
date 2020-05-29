@@ -7,7 +7,7 @@ This repository contains the code and language model necessary to replicate the 
 ##### Citation
 
 ```
-@inproceedings{aina-gulordava-boleda:2019:CL,
+@inproceedings{aina-brochhagen-boleda:2020,
     title     = {Modeling word interpretation with deep language models: The interaction between expectations and lexical information},
     author    = {Aina, Laura and Brochhagen, Thomas and Boleda, Gemma},
     booktitle = {Proceedings of the 42nd Annual Conference of the Cognitive Science Society},
